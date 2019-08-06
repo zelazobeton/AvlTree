@@ -1,8 +1,4 @@
-package com.example.AVL;
-
-import org.junit.Test;
-
-import java.security.PublicKey;
+package com.zelazobeton.AvlTree;
 
 import static org.junit.Assert.*;
 

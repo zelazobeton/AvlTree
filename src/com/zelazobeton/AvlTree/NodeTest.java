@@ -1,4 +1,4 @@
-package com.example.AVL;
+package com.zelazobeton.AvlTree;
 
 import static org.junit.Assert.*;
 

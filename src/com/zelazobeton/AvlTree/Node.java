@@ -1,4 +1,4 @@
-package com.example.AVL;
+package com.zelazobeton.AvlTree;
 
 public class Node extends INode {
     private INode leftChild;

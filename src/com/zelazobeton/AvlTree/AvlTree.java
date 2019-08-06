@@ -1,4 +1,4 @@
-package com.example.AVL;
+package com.zelazobeton.AvlTree;
 
 public class AvlTree implements IBinaryTree {
     public INode root;

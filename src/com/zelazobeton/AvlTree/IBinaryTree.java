@@ -1,4 +1,4 @@
-package com.example.AVL;
+package com.zelazobeton.AvlTree;
 
 public interface IBinaryTree {
     public boolean put(IPayload payload);

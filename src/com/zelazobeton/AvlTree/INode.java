@@ -1,4 +1,4 @@
-package com.example.AVL;
+package com.zelazobeton.AvlTree;
 
 public abstract class INode implements Comparable<INode> {
     protected IPayload payload;
