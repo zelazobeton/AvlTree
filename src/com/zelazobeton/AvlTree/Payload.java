@@ -11,6 +11,11 @@ public class Payload extends IPayload {
     }
 
     @Override
+    public int getKey(){
+        return super.key;
+    }
+
+    @Override
     public int compareTo(IPayload o) {
         if (key < o.key) {
             return -1;

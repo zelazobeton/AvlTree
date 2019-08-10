@@ -1,5 +1,7 @@
 package com.zelazobeton.AvlTree;
 
+import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
+
 public class AvlTree implements IBinaryTree {
     public INode root;
 
@@ -32,7 +34,9 @@ public class AvlTree implements IBinaryTree {
                 return put(payload, ptrNode.getRightChild());
             }
             else {
-                ptrNode.addRightChild(new Node(ptrNode, payload));
+                ptrNode.setRightChild(new Node(ptrNode, payload));
+                System.out.println("Key: " + payload.getKey() + " added");
+                updateBalanceNodeAdded(ptrNode.getRightChild());
                 return true;
             }
         }
@@ -40,7 +44,8 @@ public class AvlTree implements IBinaryTree {
             if (ptrNode.hasLeftChild()) {
                 return put(payload, ptrNode.getLeftChild());
             } else {
-                ptrNode.addLeftChild(new Node(ptrNode, payload));
+                ptrNode.setLeftChild(new Node(ptrNode, payload));
+                updateBalanceNodeAdded(ptrNode.getLeftChild());
                 return true;
             }
         }
@@ -103,32 +108,161 @@ public class AvlTree implements IBinaryTree {
                 while (successor.hasLeftChild()) {
                     successor = successor.getLeftChild();
                 }
-                INode successChild = successor.getRightChild();
-                if (successChild != null){
-                    replaceOneNodeWithAnother(successor, successChild);
+                //To refactor?
+                INode successorParentIfItIsNotToDelete = null;
+                if (successor.getParent() != toDelete){
+                    successorParentIfItIsNotToDelete = successor.getParent();
                 }
-                successor.addLeftChild(toDelete.getLeftChild());
-                successor.addRightChild(toDelete.getRightChild());
+
+                replaceOneNodeWithAnother(successor, successor.getRightChild());
+                successor.setLeftChild(toDelete.getLeftChild());
+                successor.setRightChild(toDelete.getRightChild());
+                successor.setBalanceFactor(toDelete.getBalanceFactor());
                 replaceOneNodeWithAnother(toDelete, successor);
+
+                //To refactor
+                if(successorParentIfItIsNotToDelete != null){
+                    successorParentIfItIsNotToDelete.addToBalanceFactor(-1);
+                    if (successorParentIfItIsNotToDelete.getBalanceFactor() == 0) {
+                        updateBalanceNodeDeleted(successorParentIfItIsNotToDelete);
+                    }
+                }
+                else {
+                    successor.addToBalanceFactor(1);
+                    if (successor.getBalanceFactor() == 0) {
+                        updateBalanceNodeDeleted(successor);
+                    }
+                }
             }
             else if (toDelete.hasLeftChild()) {
+                updateBalanceNodeDeleted(toDelete);
                 replaceOneNodeWithAnother(toDelete, toDelete.getLeftChild());
             }
             else if (toDelete.hasRightChild()) {
+                updateBalanceNodeDeleted(toDelete);
                 replaceOneNodeWithAnother(toDelete, toDelete.getRightChild());
             }
             else {
-                replaceOneNodeWithAnother(toDelete, null);
+                updateBalanceNodeDeleted(toDelete);
+                if (toDelete.isLeftChild()) {
+                    toDelete.getParent().setLeftChild(null);
+                }
+                else {
+                    toDelete.getParent().setRightChild(null);
+                }
             }
             return true;
         }
     }
+
     private void replaceOneNodeWithAnother(INode toReplace, INode newNode) {
+        if (toReplace == root){
+            root = newNode;
+            return;
+        }
         if (toReplace.isLeftChild()) {
-            toReplace.getParent().addLeftChild(newNode);
+            toReplace.getParent().setLeftChild(newNode);
         }
         else {
-            toReplace.getParent().addRightChild(newNode);
+            toReplace.getParent().setRightChild(newNode);
+        }
+    }
+
+    private void updateBalanceNodeAdded(INode node){
+        if (node.getBalanceFactor() < -1 || node.getBalanceFactor() > 1){
+            rebalance(node);
+            return;
+        }
+        if (node.isRoot()) {
+            return;
+        }
+        if (node.isLeftChild()) {
+            node.getParent().addToBalanceFactor(1);
+        }
+        else if (node.isRightChild()) {
+            node.getParent().addToBalanceFactor(-1);
+        }
+        if (node.getParent().getBalanceFactor() != 0) {
+            updateBalanceNodeAdded(node.getParent());
+        }
+    }
+
+    private void updateBalanceNodeDeleted(INode node){
+        if (node.getBalanceFactor() < -1 || node.getBalanceFactor() > 1){
+            rebalance(node);
+            return;
+        }
+        if (node.isRoot()) {
+            return;
+        }
+        if (node.isLeftChild()) {
+            node.getParent().addToBalanceFactor(-1);
+            if (node.getParent().getBalanceFactor() >= 0){
+                updateBalanceNodeDeleted(node.getParent());
+            }
+        }
+        else if (node.isRightChild()){
+            node.getParent().addToBalanceFactor(1);
+            if (node.getParent().getBalanceFactor() <= 0){
+                updateBalanceNodeDeleted(node.getParent());
+            }
+        }
+        if (node.getParent().getBalanceFactor() < -1 &&  node.getParent().getBalanceFactor() < -1) {
+            updateBalanceNodeDeleted(node.getParent());
+        }
+    }
+
+    private void rotateLeft(INode pivotNode){
+        INode newPivot = pivotNode.getRightChild();
+//        if (newPivot.hasLeftChild()){
+//            pivotNode.setRightChild(newPivot.getLeftChild());
+//        }
+        pivotNode.setRightChild(newPivot.getLeftChild());
+        replaceOneNodeWithAnother(pivotNode, newPivot);
+        newPivot.setLeftChild(pivotNode);
+//        pivotNode.setRightChild(null);
+        pivotNode.addToBalanceFactor(1 - Math.min(newPivot.getBalanceFactor(), 0));
+        newPivot.addToBalanceFactor(1 + Math.max(pivotNode.getBalanceFactor(), 0));
+    }
+
+    private void rotateRight(INode pivotNode){
+        INode newPivot = pivotNode.getLeftChild();
+//        if (newPivot.hasRightChild()){
+//            pivotNode.setLeftChild(newPivot.getRightChild());
+//        }
+        pivotNode.setLeftChild(newPivot.getRightChild());
+
+        replaceOneNodeWithAnother(pivotNode, newPivot);
+        newPivot.setRightChild(pivotNode);
+//        pivotNode.setLeftChild(null);
+        pivotNode.addToBalanceFactor(- 1 - Math.max(newPivot.getBalanceFactor(), 0));
+        newPivot.addToBalanceFactor(- 1 + Math.max(pivotNode.getBalanceFactor(), 0));
+    }
+
+    private void rebalance(INode node){
+        if(node.getBalanceFactor() > 1){
+            System.out.println("Rebalance > 1, Key: " + node.getPayload().getKey());
+            if(node.getLeftChild().getBalanceFactor() < 0){
+                rotateLeft(node.getLeftChild());
+            }
+            rotateRight(node);
+        }
+        else if(node.getBalanceFactor() < -1){
+            System.out.println("Rebalance < -1, Key: " + node.getPayload().getKey());
+            if(node.getRightChild().getBalanceFactor() > 0){
+                rotateRight(node.getRightChild());
+            }
+            rotateLeft(node);
+        }
+    }
+
+    public void inorder(INode node, String address){
+        if(node != null){
+            String addressLeft = address + 'L';
+            inorder(node.getLeftChild(), addressLeft);
+            System.out.println("Key: " + node.getPayload().getKey() + " Address: " + address + " BF: " + node.getBalanceFactor());
+            String addressRight = address + 'R';
+            inorder(node.getRightChild(), addressRight);
         }
     }
 }

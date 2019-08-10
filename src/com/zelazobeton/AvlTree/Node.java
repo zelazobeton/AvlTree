@@ -4,16 +4,33 @@ public class Node extends INode {
     private INode leftChild;
     private INode rightChild;
     private INode parent;
+    private byte balanceFactor;
 
-    public Node(INode parent, IPayload payload, INode leftChild, INode rightChild) {
+    public Node(INode parent, IPayload payload, INode leftChild, INode rightChild, byte balanceFactor) {
         this.leftChild = leftChild;
         this.rightChild = rightChild;
         this.parent = parent;
+        this.balanceFactor = balanceFactor;
         super.payload = payload;
     }
 
     public Node(INode parent, IPayload payload) {
-        this(parent, payload, null, null);
+        this(parent, payload, null, null, (byte) 0);
+    }
+
+    @Override
+    public void addToBalanceFactor(int toAdd){
+        this.balanceFactor += toAdd;
+    }
+
+    @Override //To delete?
+    public void setBalanceFactor(byte newBalanceFactor){
+        this.balanceFactor = newBalanceFactor;
+    }
+
+    @Override
+    public byte getBalanceFactor() {
+        return this.balanceFactor;
     }
 
     @Override
@@ -27,23 +44,19 @@ public class Node extends INode {
     }
 
     @Override
-    public void addLeftChild(INode newLeftChild) {
+    public void setLeftChild(INode newLeftChild) {
         this.leftChild = newLeftChild;
+        if(newLeftChild != null){
+            newLeftChild.setParent(this);
+        }
     }
 
     @Override
-    public void addRightChild(INode newRightChild) {
+    public void setRightChild(INode newRightChild) {
         this.rightChild = newRightChild;
-    }
-
-    @Override
-    public void removeLeftChild() {
-        this.leftChild = null;
-    }
-
-    @Override
-    public void removeRightChild() {
-        this.rightChild = null;
+        if(newRightChild != null){
+            newRightChild.setParent(this);
+        }
     }
 
     @Override
@@ -59,6 +72,11 @@ public class Node extends INode {
     @Override
     public INode getParent() {
         return this.parent;
+    }
+
+    @Override
+    public void setParent(INode newParent) {
+        this.parent = newParent;
     }
 
     @Override

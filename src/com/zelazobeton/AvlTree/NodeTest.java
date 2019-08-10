@@ -18,7 +18,7 @@ public class NodeTest {
     @org.junit.Test
     public void afterAddingLeftChildGetLeftChildShouldReturnIt() {
         INode newLeftChild = new Node(sut, new Payload());
-        sut.addLeftChild(newLeftChild);
+        sut.setLeftChild(newLeftChild);
         assertEquals(newLeftChild, sut.getLeftChild());
     }
 
@@ -30,35 +30,35 @@ public class NodeTest {
     @org.junit.Test
     public void afterAddingRightChildGetRightChildShouldReturnIt() {
         INode newRightChild = new Node(sut, new Payload());
-        sut.addRightChild(newRightChild);
+        sut.setRightChild(newRightChild);
         assertEquals(newRightChild, sut.getRightChild());
     }
 
     @org.junit.Test
     public void isLeftChildShouldReturnTrue() {
         INode leftChild = new Node(sut, new Payload());
-        sut.addLeftChild(leftChild);
+        sut.setLeftChild(leftChild);
         assertTrue(leftChild.isLeftChild());
     }
 
     @org.junit.Test
     public void isLeftChildShouldReturnFalse() {
         INode leftChild = new Node(sut, new Payload());
-        sut.addRightChild(leftChild);
+        sut.setRightChild(leftChild);
         assertFalse(leftChild.isLeftChild());
     }
 
     @org.junit.Test
     public void isRightChildShouldReturnTrue() {
         INode RightChild = new Node(sut, new Payload());
-        sut.addRightChild(RightChild);
+        sut.setRightChild(RightChild);
         assertTrue(RightChild.isRightChild());
     }
 
     @org.junit.Test
     public void isRightChildShouldReturnFalse() {
         INode RightChild = new Node(sut, new Payload());
-        sut.addLeftChild(RightChild);
+        sut.setLeftChild(RightChild);
         assertFalse(RightChild.isRightChild());
     }
 
@@ -69,7 +69,7 @@ public class NodeTest {
 
     @org.junit.Test
     public void isLeafReturnFalseIfNodeIsNotLeaf() {
-        sut.addRightChild(new Node(sut, new Payload()));
+        sut.setRightChild(new Node(sut, new Payload()));
         assertFalse(sut.isLeaf());
     }
 
@@ -80,7 +80,7 @@ public class NodeTest {
 
     @org.junit.Test
     public void isRootReturnFalse() {
-        sut.addRightChild(new Node(sut, new Payload()));
+        sut.setRightChild(new Node(sut, new Payload()));
         assertFalse(sut.getRightChild().isRoot());
     }
 }

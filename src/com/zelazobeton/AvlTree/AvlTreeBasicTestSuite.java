@@ -2,7 +2,7 @@ package com.zelazobeton.AvlTree;
 
 import static org.junit.Assert.*;
 
-public class AvlTreeTest {
+public class AvlTreeBasicTestSuite {
     private static final int FIRST_KEY = 9;
     private static final int SECOND_KEY = 12;
     private static final int THIRD_KEY = 11;
@@ -29,29 +29,44 @@ public class AvlTreeTest {
         sut.put(fifthPayload);
     }
 
-    @org.junit.BeforeClass
-    public static void setUp(){
+    @org.junit.Before
+    public void setUp(){
         sut = new AvlTree();
         putFiveCorrectPayloads();
     }
 
     @org.junit.Test
-    public void putThreeCorrectPayloadsShouldInsertThreePayloads() {
-        refToFirstPayload = sut.root.getPayload();
-        refToSecondPayload = sut.root.getRightChild().getPayload();
-        refToThirdPayload = sut.root.getRightChild().getLeftChild().getPayload();
+    public void putFiveCorrectPayloadsShouldInsertFivePayloads() {
+        refToFirstPayload = sut.root.getLeftChild().getPayload();
+        refToSecondPayload = sut.root.getRightChild().getLeftChild().getPayload();
+        refToThirdPayload = sut.root.getPayload();
+        IPayload refToFourthPayload = sut.root.getRightChild().getPayload();
+        IPayload refToFifthPayload = sut.root.getRightChild().getRightChild().getPayload();
 
         assertSame(refToFirstPayload, firstPayload);
         assertSame(refToSecondPayload, secondPayload);
         assertSame(refToThirdPayload, thirdPayload);
+        assertSame(refToFourthPayload, fourthPayload);
+        assertSame(refToFifthPayload, fifthPayload);
+    }
+
+    @org.junit.Test
+    public void checkBalanceFactorForFirstFiveNodes() {
+        assertEquals(0, sut.get(firstPayload, sut.root).getBalanceFactor());
+        assertEquals(0, sut.get(secondPayload, sut.root).getBalanceFactor());
+        assertEquals(-1, sut.get(thirdPayload, sut.root).getBalanceFactor());
+        assertEquals(0, sut.get(fourthPayload, sut.root).getBalanceFactor());
+        assertEquals(0, sut.get(fifthPayload, sut.root).getBalanceFactor());
     }
 
     @org.junit.Test
     public void deleteNodeWithBothChildren() {
         sut.delete(SECOND_KEY);
-        refToThirdPayload = sut.root.getRightChild().getLeftChild().getPayload();
+        refToFirstPayload = sut.root.getLeftChild().getPayload();
+        refToThirdPayload = sut.root.getPayload();
         IPayload refToFourthPayload = sut.root.getRightChild().getPayload();
         IPayload refToFifthPayload = sut.root.getRightChild().getRightChild().getPayload();
+        assertSame(refToFirstPayload, firstPayload);
         assertSame(refToThirdPayload, thirdPayload);
         assertSame(refToFourthPayload, fourthPayload);
         assertSame(refToFifthPayload, fifthPayload);
@@ -65,9 +80,7 @@ public class AvlTreeTest {
 
     @org.junit.Test
     public void getShouldReturnNullIfPayloadNotInTheTree() {
-//        putFiveCorrectPayloads();
         IPayload refToThirdPayload = sut.get(INEXISTING_KEY);
         assertNull(refToThirdPayload);
     }
-
 }
