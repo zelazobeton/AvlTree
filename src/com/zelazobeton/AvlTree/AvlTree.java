@@ -1,6 +1,6 @@
 package com.zelazobeton.AvlTree;
 
-public class AvlTree implements IBinaryTree {
+public class AvlTree {
     INode root;
 
     public AvlTree() {
@@ -11,7 +11,12 @@ public class AvlTree implements IBinaryTree {
         this.root = root;
     }
 
-    @Override
+    private enum EWhichChild
+    {
+        IS_LEFT_CHILD,
+        IS_RIGHT_CHILD
+    }
+
     public boolean put(IPayload payload) {
         if (root == null){
             this.root = new Node(null, payload);
@@ -46,13 +51,12 @@ public class AvlTree implements IBinaryTree {
         return true;
     }
 
-    @Override
-    public IPayload get(int key) {
+    public IPayload get(IPayload payloadToGet) {
         if (root == null){
             return null;
         }
         else {
-            INode ptrNode = get(new Payload(key), root);
+            INode ptrNode = get(payloadToGet, root);
             if (ptrNode == null) {
                 return null;
             }
@@ -77,9 +81,8 @@ public class AvlTree implements IBinaryTree {
         }
     }
 
-    @Override
-    public boolean contains(int key) {
-        IPayload keyPayload = get(key);
+    public boolean contains(IPayload payload) {
+        IPayload keyPayload = get(payload);
         if (keyPayload == null) {
             return false;
         }
@@ -88,13 +91,12 @@ public class AvlTree implements IBinaryTree {
         }
     }
 
-    @Override
-    public boolean delete(int key) {
+    public boolean delete(IPayload payloadToDelete) {
         if (root == null){
             return false;
         }
         else {
-            INode toDelete = get(new Payload(key), root);
+            INode toDelete = get(payloadToDelete, root);
             if (toDelete == null) {
                 return false;
             }
@@ -114,16 +116,14 @@ public class AvlTree implements IBinaryTree {
                 updateBalanceNodeDeleted(toDelete.getRightChild());
             }
             else {
-                updateBalanceNodeDeleted(toDelete);
                 if (toDelete.isLeftChild()) {
                     toDelete.getParent().setLeftChild(null);
-//                    toDelete.getParent().addToBalanceFactor(-1);
+                    updateBalanceNodeDeleted(toDelete, EWhichChild.IS_LEFT_CHILD);
                 }
                 else {
                     toDelete.getParent().setRightChild(null);
-//                    toDelete.getParent().addToBalanceFactor(1);
+                    updateBalanceNodeDeleted(toDelete, EWhichChild.IS_RIGHT_CHILD);
                 }
-//                updateBalanceNodeDeleted(toDelete.getParent());
             }
             return true;
         }
@@ -215,6 +215,21 @@ public class AvlTree implements IBinaryTree {
         }
     }
 
+    private void updateBalanceNodeDeleted(INode node, EWhichChild whichChild){
+        if (whichChild == EWhichChild.IS_LEFT_CHILD) {
+            node.getParent().addToBalanceFactor(-1);
+            if (node.getParent().getBalanceFactor() >= 0){
+                updateBalanceNodeDeleted(node.getParent());
+            }
+        }
+        else if (whichChild == EWhichChild.IS_RIGHT_CHILD){
+            node.getParent().addToBalanceFactor(1);
+            if (node.getParent().getBalanceFactor() <= 0){
+                updateBalanceNodeDeleted(node.getParent());
+            }
+        }
+    }
+
     private void rotateLeft(INode pivotNode){
         INode newPivot = pivotNode.getRightChild();
         pivotNode.setRightChild(newPivot.getLeftChild());
@@ -247,14 +262,6 @@ public class AvlTree implements IBinaryTree {
                 rotateRight(node.getRightChild());
             }
             rotateLeft(node);
-        }
-    }
-
-    public void inorderPrintInfo(INode node, String address){
-        if(node != null){
-            inorderPrintInfo(node.getLeftChild(), address + 'L');
-            System.out.println("Key: " + node.getPayload().getKey() + " Address: " + address + " BF: " + node.getBalanceFactor());
-            inorderPrintInfo(node.getRightChild(), address + 'R');
         }
     }
 }

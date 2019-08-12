@@ -57,7 +57,7 @@ public class AvlTreeParamTests {
             Integer r = rand.nextInt() % approxPartOfTreeToDelete;
             if (r == 0){
                 deletedSet.add(elem);
-                sut.delete(elem);
+                sut.delete(new Payload(elem));
                 itr.remove();
             }
         }
@@ -100,7 +100,7 @@ public class AvlTreeParamTests {
     public void shouldContainElements(){
         Set<Integer> inputSet = fillTreeWithRandomNumbers(sizeOfTree, maxNumberInTree);
         for(Integer elem : inputSet){
-            assertTrue(sut.contains(elem));
+            assertTrue(sut.contains(new Payload(elem)));
         }
     }
 
@@ -122,10 +122,10 @@ public class AvlTreeParamTests {
         Set<Integer> deletedSet = randomDeleteFromTree(inputSet, approxPartOfTreeToDelete);
 
         for(Integer elem : inputSet){
-            assertTrue(sut.contains(elem));
+            assertTrue(sut.contains(new Payload(elem)));
         }
         for(Integer elem : deletedSet){
-            assertFalse(sut.contains(elem));
+            assertFalse(sut.contains(new Payload(elem)));
         }
     }
 

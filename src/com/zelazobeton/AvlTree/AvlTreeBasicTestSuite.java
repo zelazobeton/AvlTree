@@ -61,7 +61,7 @@ public class AvlTreeBasicTestSuite {
 
     @org.junit.Test
     public void deleteNodeWithBothChildren() {
-        sut.delete(SECOND_KEY);
+        sut.delete(new Payload(SECOND_KEY));
         refToFirstPayload = sut.root.getLeftChild().getPayload();
         refToThirdPayload = sut.root.getPayload();
         IPayload refToFourthPayload = sut.root.getRightChild().getPayload();
@@ -74,13 +74,13 @@ public class AvlTreeBasicTestSuite {
 
     @org.junit.Test
     public void getShouldReturnPayloadIfItExistInTheTree() {
-        refToThirdPayload = sut.get(THIRD_KEY);
+        refToThirdPayload = sut.get(new Payload(THIRD_KEY));
         assertSame(refToThirdPayload, thirdPayload);
     }
 
     @org.junit.Test
     public void getShouldReturnNullIfPayloadNotInTheTree() {
-        IPayload refToThirdPayload = sut.get(INEXISTING_KEY);
+        IPayload refToThirdPayload = sut.get(new Payload(INEXISTING_KEY));
         assertNull(refToThirdPayload);
     }
 }

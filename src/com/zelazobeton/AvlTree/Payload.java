@@ -1,7 +1,7 @@
 package com.zelazobeton.AvlTree;
 
 public class Payload extends IPayload {
-
+    private int key;
     public Payload(int key) {
         this.key = key;
     }
@@ -10,20 +10,27 @@ public class Payload extends IPayload {
         this(0);
     }
 
-    @Override
     public int getKey(){
-        return super.key;
+        return key;
     }
 
     @Override
     public int compareTo(IPayload o) {
-        if (key < o.key) {
-            return -1;
+        try
+        {
+            Payload payloadObj = (Payload) o;
+            if (key < payloadObj.key) {
+                return -1;
+            }
+            else if (key > payloadObj.key) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
         }
-        else if (key > o.key) {
-            return 1;
-        }
-        else {
+        catch (ClassCastException e){
+            System.out.println(e.toString());
             return 0;
         }
     }
